@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 import {
   Select,
   SelectContent,
@@ -8,6 +9,7 @@ import {
 } from "@/components/ui/select";
 import { useDeleteDeployment } from "@/controllers/API/queries/deployments/use-delete-deployment";
 import { useGetDeploymentsByProviders } from "@/controllers/API/queries/deployments/use-get-deployments-by-providers";
+import { useFolderStore } from "@/stores/foldersStore";
 import { useDeleteWithConfirmation } from "../hooks/use-delete-with-confirmation";
 import { useProviderFilter } from "../hooks/use-provider-filter";
 import { useTestDeploymentModal } from "../hooks/use-test-deployment-modal";
@@ -37,6 +39,10 @@ export default function DeploymentsContent({
   setStepperOpen,
   onGoToProviders,
 }: DeploymentsContentProps) {
+  const { folderId } = useParams();
+  const myCollectionId = useFolderStore((state) => state.myCollectionId);
+  const currentFolderId = folderId ?? myCollectionId ?? undefined;
+
   const {
     selectedProviderId,
     setSelectedProviderId,
@@ -45,7 +51,7 @@ export default function DeploymentsContent({
   } = useProviderFilter(providers);
 
   const { deployments, isLoading: isLoadingDeployments } =
-    useGetDeploymentsByProviders(providerIdsToQuery);
+    useGetDeploymentsByProviders(providerIdsToQuery, currentFolderId);
 
   const testModal = useTestDeploymentModal();
 
